@@ -15,7 +15,6 @@ const puppeteer = require("puppeteer");
         height: 800
     });
     await page.setUserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/112.0.0.0 Safari/537.36");
-    // For example
     console.log(await GetFacebookUrls(page, "mommytalkNbabies"));
     console.log(await FacebookCrawler(page, "https://m.facebook.com/groups/1260448967306807/posts/6725742017444114/"));
     await page.close();
@@ -78,14 +77,18 @@ async function FacebookCrawler(page, url) {
     let loadMore = true;
     let click_time = 0;
     while (loadMore) {
-        await page.waitForSelector(previous_comments_class);
-        const previous_comments_element = await page.$(previous_comments_class);
-        if(previous_comments_element !== null && click_time < 100) {
-            await page.evaluate(ele => ele.click(), previous_comments_element);
-            click_time += 1;
+        try{
+            await page.waitForSelector(previous_comments_class);
         }
-        else {
-            loadMore = false;
+        finally {
+            const previous_comments_element = await page.$(previous_comments_class);
+            if(previous_comments_element !== null && click_time < 100) {
+                await page.evaluate(ele => ele.click(), previous_comments_element);
+                click_time += 1;
+            }
+            else {
+                loadMore = false;
+            }
         }
     }
     const comment_elements = await page.$$(comment_class);
